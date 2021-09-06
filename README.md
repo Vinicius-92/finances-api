@@ -53,9 +53,9 @@ Once the application is running you can check Swagger documentation clicking in 
 
 ### UML and example images:
 
-![Screenshot](https://git.gft.com/vsav/financesapi/-/raw/main/Images/UML.jpg)
-![Screenshot](https://git.gft.com/vsav/financesapi/-/raw/main/Images/UserInfo.jpg)
-![Screenshot](https://git.gft.com/vsav/financesapi/-/raw/main/Images/Quote.jpg)
+![Screenshot](https://raw.githubusercontent.com/Vinicius-92/finances-api/main/Images/UML.jpg)
+![Screenshot](https://raw.githubusercontent.com/Vinicius-92/finances-api/main/Images/UserInfo.jpg)
+![Screenshot](https://raw.githubusercontent.com/Vinicius-92/finances-api/main/Images/Quote.jpg)
 
 
 
