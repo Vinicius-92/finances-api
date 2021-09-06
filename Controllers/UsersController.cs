@@ -1,8 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
+using FinancesAPI.Data;
 using FinancesAPI.Models.DTO;
 using FinancesAPI.Models.ResponseModels;
-using FinancesAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,8 +12,8 @@ namespace FinancesAPI.Controllers
     [Route("/user")]
     public class UsersController : ControllerBase
     {
-        private readonly UserService _userService;
-        public UsersController(UserService userService) => 
+        private readonly IUserService _userService;
+        public UsersController(IUserService userService) => 
                 _userService = userService;
 
         [HttpPost]
@@ -42,6 +42,5 @@ namespace FinancesAPI.Controllers
             else
                 return Unauthorized();
         }
-
     }
 }

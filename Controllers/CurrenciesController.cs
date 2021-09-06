@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FinancesAPI.Data;
 using FinancesAPI.Hateoas;
 using FinancesAPI.Models;
 using FinancesAPI.Models.ResponseModels;
@@ -12,9 +13,9 @@ namespace FinancesAPI.Controllers
     [Route("/")]
     public class CurrenciesController : ControllerBase
     {
-        private readonly CurrencyService _currencyService;
+        private readonly ICurrencyService _currencyService;
         private HateoasImplementation _hateoas;
-        public CurrenciesController(CurrencyService currencyService)
+        public CurrenciesController(ICurrencyService currencyService)
         {
             _currencyService = currencyService;
             _hateoas = new HateoasImplementation("localhost:5001/details/");

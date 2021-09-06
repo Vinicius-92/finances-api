@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FinancesAPI.Services
 {
-    public class CurrencyService
+    public class CurrencyService : ICurrencyService
     {
         private readonly ApplicationDbContext _context;
         public CurrencyService(ApplicationDbContext context) => 

@@ -6,6 +6,7 @@ using FinancesAPI.Models.ResponseModels;
 using FinancesAPI.Hateoas;
 using Microsoft.AspNetCore.Authorization;
 using System.Linq;
+using FinancesAPI.Models.Exceptions;
 
 namespace FinancesAPI.Controllers
 {
@@ -53,7 +54,9 @@ namespace FinancesAPI.Controllers
                             Action = "Sell",
                             ValueFrom = Math.Round(exchange.SellCurrency, 4),
                             ValueTo = Math.Round(returned, 4) };
-                    await _currencyQuoteService.Sell(returnFromSell, userId);
+                    var returnedValue = await _currencyQuoteService.Sell(returnFromSell, userId);
+                    if(returnedValue == false)
+                        return BadRequest("Not enough founds to sell");
                     return Ok(returnFromSell);
                 }
                 if(exchange.BuyCurrency != 0)
@@ -64,7 +67,9 @@ namespace FinancesAPI.Controllers
                             Action = "Buy",
                             ValueFrom = Math.Round(exchange.BuyCurrency, 4),
                             ValueTo = Math.Round(returned, 4) };
-                    await _currencyQuoteService.Buy(returnFromBuy, userId);
+                    var returnedValue = await _currencyQuoteService.Buy(returnFromBuy, userId);
+                    if(returnedValue == false)
+                        return BadRequest("Insuficient funds to invest");
                     return Ok(returnFromBuy);
                 }
                 return BadRequest();

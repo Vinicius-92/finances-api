@@ -17,9 +17,9 @@ namespace FinancesAPI.Services
     public class CurrencyQuoteService
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
         private readonly ICurrencyQuoteResponse quoteResponse = RestService.For<ICurrencyQuoteResponse>(IApiUrl.Uri);
-        public CurrencyQuoteService(ApplicationDbContext context, UserService userService)
+        public CurrencyQuoteService(ApplicationDbContext context, IUserService userService)
         {
             _context = context;
             _userService = userService;
@@ -35,32 +35,29 @@ namespace FinancesAPI.Services
 
         public async Task<decimal> ExchangeCurrencyAsync(string code, CurrencyExchange exchange)
         {
-            try
-            {
-                var currencyQuote = await quoteResponse.GetCurrencyQuoteByCodeAsync(code);
-                if(exchange.SellCurrency != 0)
-                    return exchange.SellCurrency * decimal.Parse(currencyQuote[0].SellingPrice, CultureInfo.InvariantCulture);
-                else if(exchange.BuyCurrency != 0)
-                    return exchange.BuyCurrency / decimal.Parse(currencyQuote[0].PurchaseBid, CultureInfo.InvariantCulture);
-                else
-                    return 0;
-            } catch (Exception e)
-            {
-                throw new NotFoundException(e.Message);
-            }
+            var currencyQuote = await quoteResponse.GetCurrencyQuoteByCodeAsync(code);
+            if(currencyQuote == null)
+                return 0;
+            if(exchange.SellCurrency != 0)
+                return exchange.SellCurrency * decimal.Parse(currencyQuote[0].SellingPrice, CultureInfo.InvariantCulture);
+            else if(exchange.BuyCurrency != 0)
+                return exchange.BuyCurrency / decimal.Parse(currencyQuote[0].PurchaseBid, CultureInfo.InvariantCulture);
+            else
+                return 0;
         }
 
-        public async Task Buy(CurrencyExchangeResponse response, int userId)
+        public async Task<bool> Buy(CurrencyExchangeResponse response, int userId)
         {
             var user = await _context.Users.Include(x => x.MyWallet).Include(p => p.MyWallet.CurrencyInvestiments).FirstAsync(y => y.Id == userId);
             var investiment = user.MyWallet.CurrencyInvestiments.FirstOrDefault(p => p.CurrencyCode == response.CurrencyTo);
             if(user.MyWallet.NativeCurrency < response.ValueFrom)
-                throw new InsufficientFundsException("Insuficient amount a native currency to invest");
+                return false;
             if(investiment != null && investiment.CurrencyCode == response.CurrencyTo)
             {
                 investiment.Value += response.ValueTo;
                 user.MyWallet.NativeCurrency -= response.ValueFrom;
                 await _context.SaveChangesAsync();
+                return true;
             }
             else
             {
@@ -71,23 +68,25 @@ namespace FinancesAPI.Services
                 user.MyWallet.NativeCurrency -= response.ValueFrom;
                 user.MyWallet.CurrencyInvestiments.Add(investimentToSave);
                 await _context.SaveChangesAsync();
+                return true;
             }
         }
 
-        public async Task Sell(CurrencyExchangeResponse response, int userId)
+        public async Task<bool> Sell(CurrencyExchangeResponse response, int userId)
         {
             var user = await _userService.ReturnUser(userId);
             var investiment = user.MyWallet.CurrencyInvestiments.FirstOrDefault(p => p.CurrencyCode == response.CurrencyFrom);
-            if(investiment.Value < response.ValueFrom)
-                throw new InsufficientFundsException("Not enough funds to sell");
             if(investiment != null)
             {
+                if(investiment.Value < response.ValueFrom)
+                    return false;
                 investiment.Value -= response.ValueFrom;
                 user.MyWallet.NativeCurrency += response.ValueTo;
                 await _context.SaveChangesAsync();
+                return true;
             }
             else
-                throw new UnableToFindCurrencyInWalletException("User's investiments doesn't contain this currency");
+                return false;
         }
     }
 }
