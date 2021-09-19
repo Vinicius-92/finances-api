@@ -41,10 +41,70 @@ In order to negotiate the currencies you'll have to be already logged in your ac
 ### **Login:** vinicius@gft.com
 #### **Password:** vinicius
 
-Once the application is running you can check Swagger documentation clicking in the image below:
+## Endpoints:
 
-[![Click here for documentation](https://raw.githubusercontent.com/swagger-api/swagger.io/wordpress/images/assets/SW-logo-clr.png)](https://localhost:5001/swagger/index.html)
+### Login needed for access data and exchange
+```
+    POST - LOGIN
+    /user/login
+    Body:
+    {
+        "email": "email",
+        "password": "password"
+    }
 
+    POST - CREATE
+    /user/
+    {
+        "name": "name",
+        "email": "email",
+        "password": "password",
+        "initialDeposit": 0.0000000
+    }
+
+    GET - GET USER INFORMATION AND WALLET
+    /user/{id}
+    
+    AFTER LOGGED IN YOU'LL NEED TOKEN FOR FURTHER ACTIONS ON SYSTEM
+```
+
+### Get informations on currencies available for exchange
+```
+    GET - GET ALL CURRENCIES
+    /
+
+    POST - CREATE NEW CURRENCY
+    /
+    {
+        "code": "code",
+        "name": "name"
+    }
+
+    DELETE - DELETE CURRENCY
+    /
+    {
+        "code": "code",
+        "name": "name"
+    }
+```
+
+### Exchange currency and get currency quote details
+```
+    GET - GET CURRENCY DETAILS BY CODE
+    /details/{code}
+
+    POST - EXCHANGE CURRENCY AND CREATE INVESTMENT IN USER'S WALLET
+    /details/{code}
+    BUY
+    {
+        "buyCurrency": 0
+    }
+
+    SELL
+    {
+        "sellCurrency": 0
+    }
+```
 
 ## Todo:
 * Add encryption for password
